@@ -415,7 +415,6 @@ export default function MacOSDesktop({ visible }) {
     { id: 'concepts', icon: Lightbulb, label: '创意概念', color: '#8B5CF6' },
     { id: 'aiLab', icon: Cpu, label: 'AI实验室', color: '#10B981' },
     { id: 'visual', icon: Eye, label: '视觉设计', color: '#64748B' },
-    { id: 'minesweeper', icon: Bomb, label: '扫雷', color: '#EF4444' },
     { id: 'contact', icon: Mail, label: '联系方式', color: '#FF6B6B' },
   ]
 
@@ -482,7 +481,7 @@ export default function MacOSDesktop({ visible }) {
             position: 'fixed', top: 0, left: 0,
             width: '100vw', height: '100vh',
             border: 'none', zIndex: 4,
-            pointerEvents: 'auto',
+            pointerEvents: 'none',
           }}
           title="Desktop Pet"
         />

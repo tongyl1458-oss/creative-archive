@@ -14,8 +14,3 @@ public/creative-archive/HEAD
 public/creative-archive/description
 public/creative-archive/index
 public/creative-archive/COMMIT_EDITMSG
-
-# Exclude large video files
-public/creative-archive/videos/*.mp4
-public/creative-archive/bts/*.mp4
-public/creative-archive/music/*.mp3

@@ -389,7 +389,9 @@ function BloomController({ bloomRef }) {
 function Scene({ bloomRef }) {
   return (
     <>
-      <Environment preset="city" background={false} />
+      <Suspense fallback={null}>
+        <Environment preset="city" background={false} />
+      </Suspense>
 
       {/* Main directional light */}
       <directionalLight

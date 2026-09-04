@@ -555,14 +555,10 @@
     top: 44px;
     left: 20px;
   }
-  .mac-window {
-    width: 92vw !important;
-    max-width: 92vw !important;
-    left: 4vw !important;
-    max-height: 80vh;
-  }
-  .mac-window-content {
-    padding: 16px;
+  .mac-window-fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
   }
   .mac-menu-bar {
     height: 24px;
@@ -624,14 +620,8 @@
     height: 28px;
     margin: 0 2px;
   }
-  .mac-window {
-    width: 95vw !important;
-    max-width: 95vw !important;
-    left: 2.5vw !important;
-    max-height: 78vh;
-  }
   .mac-window-content {
-    padding: 12px;
+    padding: 8px;
   }
   .mac-about-avatar {
     width: 56px;
@@ -683,11 +673,4 @@
   }
 }
 
-/* Mobile welcome window */
-@media (max-width: 480px) {
-  .mac-window[style*="480"] {
-    width: 90vw !important;
-    max-width: 90vw !important;
-    left: 5vw !important;
-  }
-}
+

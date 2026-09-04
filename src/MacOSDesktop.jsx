@@ -240,6 +240,10 @@ function MacWindow({ title, onClose, children, width = 560, height = 420, initia
   const prevPosition = useRef(null)
 
   useEffect(() => {
+    if (window.innerWidth < 768 && !isFullscreen) {
+      setIsFullscreen(true)
+      return
+    }
     if (!isFullscreen) {
       setPosition({
         x: (window.innerWidth - width) / 2,

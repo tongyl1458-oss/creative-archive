@@ -509,6 +509,23 @@
       display: block;
       background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 50%, #2a2a3e 100%);
     }
+    .thumbnail-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 50%, #2a2a3e 100%);
+    }
+    .thumb-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 50%, #2a2a3e 100%);
+      color: rgba(255,255,255,0.3);
+      font-size: 1.5rem;
+    }
     
     /* ===== Center Video Player ===== */
     .video-player {
@@ -918,12 +935,12 @@
     }
     
     @media (max-width: 480px) {
-      .center-stage { width: 85vw; height: 85vw; max-width: 320px; max-height: 320px; }
-      .outer-ring { width: 80vw; height: 80vw; max-width: 300px; max-height: 300px; }
-      .thumbnails-ring { width: 70vw; height: 70vw; max-width: 260px; max-height: 260px; }
-      .thumbnail-item { width: 42px; height: 65px; margin-left: -21px; margin-top: -32px; }
-      .video-player { width: 130px; height: 130px; }
-      .video-player video { width: 130px; height: 130px; }
+      .center-stage { width: 85vw; height: 85vw; max-width: 300px; max-height: 300px; }
+      .outer-ring { width: 80vw; height: 80vw; max-width: 280px; max-height: 280px; }
+      .thumbnails-ring { width: 72vw; height: 72vw; max-width: 250px; max-height: 250px; }
+      .thumbnail-item { width: 38px; height: 58px; margin-left: -19px; margin-top: -29px; }
+      .video-player { width: 120px; height: 120px; }
+      .video-player video { width: 120px; height: 120px; }
       .top-nav { padding: 14px 16px; }
       .nav-name { font-size: 0.85rem; }
       .nav-title { display: none; }
@@ -1468,7 +1485,8 @@
     // Generate thumbnails in a circle
     function generateThumbnails() {
       const ring = document.getElementById('thumbnailsRing');
-      const radius = 240; // radius of the ring
+      const ringW = ring.offsetWidth;
+      const radius = ringW / 2 - 40;
       
       videos.forEach((video, index) => {
         const angle = (index / videos.length) * 360;
@@ -1485,9 +1503,9 @@
         // Use image or video for cover
         let coverHtml = '';
         if (video.coverIsImage) {
-          coverHtml = `<img src="${video.cover}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+          coverHtml = `<img src="${video.cover}" onerror="this.outerHTML='<div class=\\'thumb-fallback\\'>▶</div>'" style="width:100%;height:100%;object-fit:cover;display:block;">`;
         } else {
-          coverHtml = `<video src="${video.cover}" muted preload="metadata" playsinline></video>`;
+          coverHtml = `<video src="${video.cover}" muted preload="metadata" playsinline onerror="this.outerHTML='<div class=\\'thumb-fallback\\'>▶</div>'" onloadeddata="this.style.background='transparent'"></video>`;
         }
         
         thumb.innerHTML = `

@@ -10,6 +10,66 @@ import './MacOSDesktop.css'
 
 const BASE = import.meta.env.BASE_URL
 
+/* ===== Subpage Preloader — silent hidden iframes + resource prefetch ===== */
+function SubpagePreloader({ visible }) {
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    if (!visible) return
+    const timer = setTimeout(() => setActive(true), 2000)
+    return () => clearTimeout(timer)
+  }, [visible])
+
+  useEffect(() => {
+    if (!active) return
+
+    const resources = [
+      { href: `${BASE}creative-archive/videos/chongqing-cover.png`, as: 'image', rel: 'preload' },
+      { href: `${BASE}creative-archive/videos/luosifen-cover.png`, as: 'image', rel: 'preload' },
+      { href: `${BASE}creative-archive/videos/chongqing.mp4`, as: 'video', rel: 'prefetch' },
+      { href: `${BASE}creative-archive/videos/ai-science.mp4`, as: 'fetch', rel: 'prefetch' },
+      { href: `${BASE}creative-archive/videos/ai-kunpeng.mp4`, as: 'fetch', rel: 'prefetch' },
+      { href: `${BASE}creative-archive/videos/ai-puppy.mp4`, as: 'fetch', rel: 'prefetch' },
+      { href: `${BASE}creative-archive/videos/ai-luosifen-ad.mp4`, as: 'fetch', rel: 'prefetch' },
+      { href: `${BASE}creative-archive/videos/ai-chongqing-stardew.mp4`, as: 'fetch', rel: 'prefetch' },
+      { href: `${BASE}creative-archive/music/ai-song.mp3`, as: 'fetch', rel: 'prefetch' },
+      { href: `${BASE}desktop-pet/app-icon.png`, as: 'image', rel: 'preload' },
+      { href: `${BASE}desktop-pet/minesweeper-icon.png`, as: 'image', rel: 'preload' },
+    ]
+
+    const links = resources.map(r => {
+      const link = document.createElement('link')
+      link.rel = r.rel
+      link.href = r.href
+      link.as = r.as
+      if (r.rel === 'preload') link.fetchpriority = 'low'
+      document.head.appendChild(link)
+      return link
+    })
+
+    return () => { links.forEach(l => l.remove()) }
+  }, [active])
+
+  const urls = [
+    `${BASE}creative-archive/creative-archive.html`,
+    `${BASE}creative-archive/films.html`,
+    `${BASE}creative-archive/concepts.html`,
+    `${BASE}creative-archive/ai-lab.html`,
+    `${BASE}creative-archive/visual.html`,
+    `${BASE}minesweeper/index.html`,
+  ]
+
+  if (!active) return null
+
+  return (
+    <div style={{ position: 'fixed', top: -9999, left: -9999, width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+      {urls.map((src, i) => (
+        <iframe key={i} src={src} style={{ width: 1, height: 1, border: 'none' }} title={`preload-${i}`} />
+      ))}
+    </div>
+  )
+}
+
 /* ===== macOS Menu Bar ===== */
 function MenuBar() {
   const [time, setTime] = useState(new Date())
@@ -516,6 +576,8 @@ export default function MacOSDesktop({ visible }) {
         <DockIcon icon={Settings} label="系统设置" color="#6B7280" onClick={() => {}} />
         <DockIcon icon={FileText} label="废纸篓" color="#9CA3AF" onClick={() => {}} />
       </div>
+
+      <SubpagePreloader visible={visible} />
     </div>
   )
 }

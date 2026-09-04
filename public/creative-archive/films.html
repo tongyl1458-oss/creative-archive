@@ -1010,7 +1010,7 @@
     <div class="video-player" id="videoPlayer">
       <div class="video-container">
         <div class="video-cover" id="videoCover">
-          <video class="cover-video" id="coverVideo" src="" poster="videos/chongqing-cover.png" muted preload="none" playsinline></video>
+          <video class="cover-video" id="coverVideo" src="" poster="videos/chongqing-cover.png" muted preload="metadata" playsinline></video>
           <img class="cover-video" id="coverImage" src="" style="display:none; object-fit:cover; width:100%; height:100%;">
           <div class="play-button" id="playButton">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1103,7 +1103,7 @@
         id: 2,
         title: '科普——AI',
         category: 'animations',
-        cover: 'videos/ai-science.mp4#t=0.5',
+        cover: 'videos/ai-science.mp4',
         videoSrc: 'videos/ai-science.mp4'
       },
       {
@@ -1118,21 +1118,21 @@
         id: 4,
         title: 'AI——鲲鹏',
         category: 'animations',
-        cover: 'videos/ai-kunpeng.mp4#t=0.5',
+        cover: 'videos/ai-kunpeng.mp4',
         videoSrc: 'videos/ai-kunpeng.mp4'
       },
       {
         id: 5,
         title: 'AI——小狗玩偶',
         category: 'interactions',
-        cover: 'videos/ai-puppy.mp4#t=0.5',
+        cover: 'videos/ai-puppy.mp4',
         videoSrc: 'videos/ai-puppy.mp4'
       },
       {
         id: 6,
         title: 'AI——重庆星露谷',
         category: 'projects',
-        cover: 'videos/ai-chongqing-stardew.mp4#t=0.5',
+        cover: 'videos/ai-chongqing-stardew.mp4',
         videoSrc: 'videos/ai-chongqing-stardew.mp4'
       }
     ];
@@ -1403,12 +1403,14 @@
       
       if (video.coverIsImage) {
         coverVideo.style.display = 'none';
+        coverVideo.removeAttribute('src');
+        coverVideo.load();
         coverImage.style.display = 'block';
         coverImage.src = video.cover;
       } else {
         coverImage.style.display = 'none';
         coverVideo.style.display = 'block';
-        coverVideo.src = video.videoSrc + '#t=0.5';
+        coverVideo.src = video.videoSrc;
         coverVideo.load();
       }
       
@@ -1485,7 +1487,7 @@
         if (video.coverIsImage) {
           coverHtml = `<img src="${video.cover}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
         } else {
-          coverHtml = `<video src="${video.cover}" muted preload="none" playsinline></video>`;
+          coverHtml = `<video src="${video.cover}" muted preload="metadata" playsinline></video>`;
         }
         
         thumb.innerHTML = `

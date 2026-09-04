@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import './MacOSDesktop.css'
 
+const BASE = import.meta.env.BASE_URL
+
 /* ===== macOS Menu Bar ===== */
 function MenuBar() {
   const [time, setTime] = useState(new Date())
@@ -396,13 +398,13 @@ export default function MacOSDesktop({ visible }) {
 
   const windows = {
     welcome: { title: '欢迎 — Welcome', content: <WelcomeContent onOpen={setActiveWindow} />, width: 480, height: 460 },
-    about: { title: '关于我 — 刘怡彤 Sunny', content: <IframeContent src="/creative-archive/creative-archive.html" />, width: medW, height: medH },
+    about: { title: '关于我 — 刘怡彤 Sunny', content: <IframeContent src={`${BASE}creative-archive/creative-archive.html`} />, width: medW, height: medH },
     projects: { title: '作品项目', content: <ProjectsContent onOpen={setActiveWindow} />, width: 560, height: 420 },
-    films: { title: '影像作品 — FILMS', content: <IframeContent src="/creative-archive/films.html" />, width: largeW, height: largeH },
-    concepts: { title: '创意概念 — CONCEPTS', content: <IframeContent src="/creative-archive/concepts.html" />, width: largeW, height: largeH },
-    aiLab: { title: 'AI实验室 — AI LAB', content: <IframeContent src="/creative-archive/ai-lab.html" />, width: largeW, height: largeH },
-    visual: { title: '视觉设计 — VISUAL', content: <IframeContent src="/creative-archive/visual.html" />, width: largeW, height: largeH },
-    minesweeper: { title: '扫雷 — Minesweeper', content: <IframeContent src="/minesweeper/index.html" />, width: minesweeperSize.width, height: minesweeperSize.height },
+    films: { title: '影像作品 — FILMS', content: <IframeContent src={`${BASE}creative-archive/films.html`} />, width: largeW, height: largeH },
+    concepts: { title: '创意概念 — CONCEPTS', content: <IframeContent src={`${BASE}creative-archive/concepts.html`} />, width: largeW, height: largeH },
+    aiLab: { title: 'AI实验室 — AI LAB', content: <IframeContent src={`${BASE}creative-archive/ai-lab.html`} />, width: largeW, height: largeH },
+    visual: { title: '视觉设计 — VISUAL', content: <IframeContent src={`${BASE}creative-archive/visual.html`} />, width: largeW, height: largeH },
+    minesweeper: { title: '扫雷 — Minesweeper', content: <IframeContent src={`${BASE}minesweeper/index.html`} />, width: minesweeperSize.width, height: minesweeperSize.height },
     contact: { title: '联系方式 — Contact', content: <ContactContent />, width: 480, height: 420 },
   }
 
@@ -448,7 +450,7 @@ export default function MacOSDesktop({ visible }) {
           onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
         >
-          <img src="/desktop-pet/app-icon.png" alt="桌面宠物"
+          <img src={`${BASE}desktop-pet/app-icon.png`} alt="桌面宠物"
             style={{ width: 40, height: 40, imageRendering: 'pixelated' }} />
         </div>
 
@@ -467,7 +469,7 @@ export default function MacOSDesktop({ visible }) {
           onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
         >
-          <img src="/desktop-pet/minesweeper-icon.png" alt="扫雷"
+          <img src={`${BASE}desktop-pet/minesweeper-icon.png`} alt="扫雷"
             style={{ width: 40, height: 40, imageRendering: 'pixelated' }} />
         </div>
       </div>
@@ -475,7 +477,7 @@ export default function MacOSDesktop({ visible }) {
       {/* Desktop Pet walking freely on desktop */}
       {showPet && (
         <iframe
-          src="/desktop-pet/index.html"
+          src={`${BASE}desktop-pet/index.html`}
           style={{
             position: 'fixed', top: 0, left: 0,
             width: '100vw', height: '100vh',

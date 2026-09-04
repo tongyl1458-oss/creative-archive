@@ -1,0 +1,393 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(4px); opacity: 1; }
+}
+
+html, body, #root {
+  width: 100%;
+  background: #0a0a14;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.app {
+  position: relative;
+  width: 100%;
+}
+
+/* R3F Canvas wrapper div — needs pointer-events for mouse tracking */
+.app > div:first-child {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.app canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  pointer-events: auto;
+}
+
+/* ===== Pinned Hero Section ===== */
+.hero-pinned {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Nav */
+.nav-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 48px;
+  pointer-events: auto;
+  transition: opacity 0.1s linear;
+}
+
+.nav-brand {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-links a {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Hero text */
+.hero-text {
+  position: absolute;
+  bottom: 12%;
+  left: 48px;
+  pointer-events: none;
+  transition: opacity 0.1s linear;
+}
+
+.hero-eyebrow {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.hero-title {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 20px;
+  text-shadow: 0 0 60px rgba(74, 158, 255, 0.3);
+}
+
+.hero-subtitle {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.8;
+}
+
+/* Scroll hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  transition: opacity 0.1s linear;
+}
+
+.scroll-hint span {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.7rem;
+  color: #1a2a5a;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Mouse scroll icon — SVG style */
+.scroll-mouse {
+  width: 20px;
+  height: 32px;
+  border: 1.5px solid rgba(74, 158, 255, 0.55);
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 5px;
+  opacity: 0.85;
+}
+
+.scroll-wheel {
+  width: 2px;
+  height: 6px;
+  background: rgba(74, 158, 255, 0.8);
+  border-radius: 2px;
+  animation: scrollWheel 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollWheel {
+  0% { transform: translateY(0); opacity: 0.6; }
+  30% { transform: translateY(8px); opacity: 1; }
+  60% { transform: translateY(12px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 0; }
+}
+
+/* ===== Screen Immersion Overlay ===== */
+.screen-immersion {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(74, 158, 255, 0.25) 0%,
+    rgba(74, 158, 255, 0.1) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  transition: opacity 0.15s linear;
+}
+
+/* ===== About Section (inside pinned area) ===== */
+.about-section {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 0.15s linear;
+}
+
+.about-content {
+  text-align: center;
+  max-width: 700px;
+  padding: 0 24px;
+}
+
+.about-eyebrow {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.7rem;
+  color: rgba(74, 158, 255, 0.6);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.about-title {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 24px;
+  text-shadow: 0 0 80px rgba(74, 158, 255, 0.4);
+}
+
+.about-desc {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.8;
+  margin-bottom: 48px;
+}
+
+.about-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  pointer-events: auto;
+}
+
+.about-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.about-card:hover {
+  background: rgba(74, 158, 255, 0.08);
+  border-color: rgba(74, 158, 255, 0.3);
+  transform: translateY(-4px);
+}
+
+.card-num {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.15em;
+}
+
+.card-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.05em;
+}
+
+.card-sub {
+  font-family: -apple-system, "PingFang SC", sans-serif;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ===== Next Section (after pinned area) ===== */
+.next-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: #0a0a14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.next-content {
+  text-align: center;
+}
+
+.next-content h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 3rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+}
+
+.next-content p {
+  font-family: -apple-system, "PingFang SC", sans-serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.next-eyebrow {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.7rem;
+  color: rgba(74, 158, 255, 0.6);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.next-contact {
+  display: inline-block;
+  margin-top: 24px;
+  padding: 12px 32px;
+  border-radius: 24px;
+  background: rgba(74, 158, 255, 0.12);
+  border: 1px solid rgba(74, 158, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.next-contact:hover {
+  background: rgba(74, 158, 255, 0.2);
+  border-color: rgba(74, 158, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.next-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 32px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .nav-bar { padding: 20px 24px; }
+  .nav-links { gap: 20px; }
+  .nav-links a { font-size: 0.68rem; }
+  .hero-text { left: 24px; bottom: 18%; }
+  .about-cards { grid-template-columns: repeat(2, 1fr); }
+  .about-content { max-width: 90vw; }
+  .next-content h2 { font-size: 2rem; }
+  .next-info { flex-direction: column; gap: 6px; }
+}
+
+@media (max-width: 480px) {
+  .nav-bar { padding: 16px 16px; }
+  .nav-brand { font-size: 0.7rem; }
+  .nav-links { display: none; }
+  .hero-text { left: 16px; bottom: 20%; }
+  .about-cards { grid-template-columns: 1fr; }
+  .about-card { padding: 16px 8px; }
+  .next-content h2 { font-size: 1.5rem; }
+  .next-content p { font-size: 0.85rem; }
+}
+
+/* Touch device adaptations */
+@media (hover: none) and (pointer: coarse) {
+  .about-card:hover { transform: none; }
+  .next-contact:hover { transform: none; }
+  .mac-project-card:hover { background: rgba(0, 0, 0, 0.03); }
+}

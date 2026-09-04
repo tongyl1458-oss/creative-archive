@@ -1,0 +1,1910 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI LAB · 智能探索实验室 | Creative OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* === Hide old page chrome (prevents flash on iframe load) === */
+  .top-nav, .nav-bar, nav, header, .back-home-btn,
+  [class*="hero"], [class*="Hero"], .hero-section, .hero-overlay, .hero-art-text,
+  .ai-lab-header, .ai-lab-hero, .archive-hero,
+  .scroll-hint, [class*="scroll-hint"],
+  .nav, .navbar, .navigation, .nav-wrapper, .nav-container,
+  [class*="top-nav"], [class*="nav-brand"], [class*="nav-links"]
+  { display: none !important; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :root {
+    --bg: #FAFAFA;
+    --bg-2: #F5F5F7;
+    --ink: #1A1A1A;
+    --ink-2: #3D3D3D;
+    --muted: #86868B;
+    --rule: rgba(0, 0, 0, 0.08);
+    --glass: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --film-color: #3B82F6;
+    --concept-color: #8B5CF6;
+    --ai-color: #3B82F6;
+    --visual-color: #64748B;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --ai-glow: rgba(59, 130, 246, 0.15);
+    --accent: #3B82F6;
+    --warm: #60A5FA;
+    --dark: #111;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .mono {
+    font-family: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace,
+                 Menlo, Consolas, monospace;
+    letter-spacing: 0.02em;
+  }
+
+  /* ===== Background Canvas ===== */
+  .bg-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-grid {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  .bg-glow {
+    position: absolute; border-radius: 50%;
+    filter: blur(120px); opacity: 0.4;
+  }
+  .bg-glow-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.12), transparent 70%);
+    top: -200px; right: -100px;
+    animation: floatGlow 20s ease-in-out infinite;
+  }
+  .bg-glow-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent 70%);
+    bottom: -150px; left: -100px;
+    animation: floatGlow 25s ease-in-out infinite reverse;
+  }
+  .bg-glow-3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+    top: 40%; left: 60%;
+    animation: floatGlow 22s ease-in-out infinite;
+  }
+  @keyframes floatGlow {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 30px) scale(0.95); }
+  }
+
+  /* ===== Particle System ===== */
+  .particles {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: var(--ink);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: particleFloat linear infinite;
+  }
+  @keyframes particleFloat {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.15; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ===== Top Nav ===== */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 24px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(250, 250, 250, 0.7);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .back-home-btn {
+    position: fixed; top: 104px; left: 48px; z-index: 999;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 20px;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--rule);
+    text-decoration: none; color: var(--ink-2);
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em;
+    transition: all 0.3s ease;
+  }
+  .back-home-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .back-home-btn svg { width: 14px; height: 14px; }
+  .nav-brand { display: flex; flex-direction: column; gap: 2px; text-decoration: none; }
+  .nav-name { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+  .nav-title { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 48px; list-style: none; }
+  .nav-links a {
+    text-decoration: none; color: var(--ink-2);
+    font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+    position: relative; transition: color 0.3s ease;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--ink); transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--ink); font-weight: 600; }
+  .nav-links a.active::after { width: 100%; }
+  @media (max-width: 900px) {
+    .top-nav { padding: 18px 24px; }
+    .back-home-btn { top: 92px; left: 24px; padding: 6px 10px; }
+    .back-home-btn span { display: none; }
+    .nav-links { gap: 24px; }
+    .nav-links a { font-size: 0.75rem; }
+  }
+
+  /* ===== Hero Section ===== */
+  .hero {
+    position: relative;
+    z-index: 2;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 140px 48px 80px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    color: var(--ai-color);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: ''; width: 30px; height: 1px;
+    background: var(--ai-color); opacity: 0.4;
+  }
+  .hero-title-en {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .hero-title-zh {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--ink-2);
+    margin-bottom: 28px;
+  }
+  .hero-slogan {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    max-width: 600px;
+  }
+  .hero-slogan .highlight {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ===== Filter Tags ===== */
+  .filter-bar {
+    position: sticky;
+    top: 80px;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 48px;
+    background: rgba(250, 250, 250, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .filter-tag {
+    padding: 8px 22px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .filter-tag:hover {
+    color: var(--ink);
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+  .filter-tag.active {
+    color: #fff;
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  @media (max-width: 760px) {
+    .filter-bar { padding: 12px 16px; gap: 8px; }
+    .filter-tag { padding: 6px 16px; font-size: 0.72rem; }
+  }
+
+  /* ===== Stages Container ===== */
+  .stages {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 48px 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+  }
+
+  /* ===== Stage Card Base ===== */
+  .stage {
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .stage.hidden {
+    display: none;
+  }
+
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stage-num {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .stage-num::before {
+    content: 'STAGE ';
+  }
+  .stage-divider {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .stage-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .stage-tag {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--ai-color);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+  }
+  .stage-tag.warm {
+    background: rgba(96, 165, 250, 0.08);
+    color: var(--warm);
+    border-color: rgba(96, 165, 250, 0.15);
+  }
+  .stage-tag.purple {
+    background: rgba(139, 92, 246, 0.08);
+    color: #8B5CF6;
+    border-color: rgba(139, 92, 246, 0.15);
+  }
+  .stage-tag.gray {
+    background: rgba(100, 116, 139, 0.08);
+    color: #64748B;
+    border-color: rgba(100, 116, 139, 0.15);
+  }
+
+  .stage-title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .stage-desc {
+    font-size: 0.92rem;
+    color: var(--ink-2);
+    line-height: 1.8;
+    max-width: 680px;
+    margin-bottom: 32px;
+  }
+
+  /* ===== Stage 1: Music Player Card ===== */
+  .music-card {
+    background: linear-gradient(160deg, #0A0A0A 0%, #1A1A1A 100%);
+    border-radius: 26px;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 48px;
+    align-items: center;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 24px 80px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+    position: relative;
+  }
+  .music-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+    filter: blur(40px);
+    pointer-events: none;
+  }
+
+  /* Vinyl Record */
+  .vinyl-wrap {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .vinyl {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background:
+      repeating-radial-gradient(circle at center,
+        #0A0A0A 0px, #0A0A0A 2px,
+        #1A1A1A 3px, #1A1A1A 4px),
+      radial-gradient(circle at center, #2A2A2A 0%, #0A0A0A 70%);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      inset 0 0 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: vinylSpin 8s linear infinite;
+    animation-play-state: paused;
+    cursor: pointer;
+    transition: box-shadow 0.4s ease;
+  }
+  .vinyl.playing {
+    animation-play-state: running;
+    box-shadow:
+      0 0 0 1px rgba(59, 130, 246, 0.3),
+      0 0 40px rgba(59, 130, 246, 0.2),
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      inset 0 0 30px rgba(0, 0, 0, 0.5);
+  }
+  .vinyl::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 35%; height: 35%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    box-shadow: 0 0 0 4px #0A0A0A;
+  }
+  .vinyl::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #0A0A0A;
+  }
+  @keyframes vinylSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Tonearm */
+  .tonearm {
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    width: 120px;
+    height: 8px;
+    transform-origin: right center;
+    transform: rotate(-25deg);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .tonearm.playing { transform: rotate(0deg); }
+  .tonearm-base {
+    position: absolute;
+    right: 0; top: -8px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #C0C0C0, #808080);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  .tonearm-bar {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #C0C0C0, #A0A0A0);
+    border-radius: 2px;
+  }
+  .tonearm-head {
+    position: absolute;
+    left: -4px; top: -4px;
+    width: 16px; height: 12px;
+    background: #666;
+    border-radius: 2px;
+  }
+
+  /* Music Info */
+  .music-info { position: relative; z-index: 2; }
+  .music-label {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .music-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .music-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 24px;
+  }
+
+  /* Waveform */
+  .waveform {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 48px;
+    margin-bottom: 28px;
+  }
+  .wave-bar {
+    flex: 1;
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 2px;
+    min-height: 4px;
+    transition: background 0.3s ease;
+  }
+  .wave-bar.active { background: var(--ai-color); }
+
+  /* Music Controls */
+  .music-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .play-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--ai-color);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .play-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.55);
+  }
+  .play-btn svg { width: 22px; height: 22px; }
+  .netease-btn {
+    padding: 12px 28px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+  .netease-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+  }
+  .netease-btn svg { width: 16px; height: 16px; }
+
+  @media (max-width: 760px) {
+    .music-card {
+      grid-template-columns: 1fr;
+      padding: 32px 24px;
+      gap: 32px;
+    }
+    .vinyl-wrap { width: 200px; height: 200px; margin: 0 auto; }
+    .music-title { font-size: 1.5rem; }
+  }
+
+  /* ===== Stage 2: Workflow Grid (placeholder) ===== */
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .workflow-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 26px;
+    padding: 32px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    box-shadow:
+      0 0 0 1px rgba(120, 150, 255, 0.1),
+      0 6px 24px rgba(120, 150, 255, 0.06),
+      0 18px 50px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+  }
+  .workflow-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    padding: 2px;
+    background: linear-gradient(140deg, rgba(120, 160, 255, 0.4) 0%, rgba(170, 140, 250, 0.12) 30%, rgba(255, 255, 255, 0) 60%, rgba(120, 160, 255, 0.2) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .workflow-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 0 0 1px rgba(120, 150, 255, 0.15),
+      0 10px 32px rgba(120, 150, 255, 0.1),
+      0 28px 65px rgba(0, 0, 0, 0.06);
+  }
+  .workflow-card-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: rgba(59, 130, 246, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ai-color);
+    opacity: 0.6;
+  }
+  .workflow-card-icon svg { width: 24px; height: 24px; }
+  .workflow-card-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .workflow-card-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .workflow-reserve {
+    min-height: 20px;
+  }
+
+  /* ===== Behind-the-Scenes Gallery ===== */
+  .bts-section {
+    margin-top: 16px;
+  }
+  .bts-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .bts-header-label {
+    font-family: "SF Mono", "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--ai-color);
+    text-transform: uppercase;
+  }
+  .bts-header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .bts-header-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .bts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 880px;
+  }
+  .bts-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    aspect-ratio: 1 / 1;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.4s ease;
+    cursor: pointer;
+  }
+  .bts-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  .bts-item video,
+  .bts-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 8px;
+    background: linear-gradient(110deg, #f0f0f3 8%, #e8e8ed 18%, #f0f0f3 33%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bts-item:hover video,
+  .bts-item:hover img {
+    transform: scale(1.03);
+  }
+  .bts-item-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 32px 16px 12px;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.75));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .bts-item:hover .bts-item-overlay {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .bts-item-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+  .bts-item-tag {
+    font-family: "SF Mono", "JetBrains Mono", monospace;
+    font-size: 0.62rem;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  @media (max-width: 768px) {
+    .bts-grid { grid-template-columns: repeat(2, 1fr); max-width: none; }
+  }
+  @media (max-width: 480px) {
+    .bts-grid { grid-template-columns: 1fr; max-width: none; }
+  }
+
+  /* ===== Stage 3: Split Screen ===== */
+  .split-screen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-radius: 26px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px var(--rule),
+      0 16px 60px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  .split-side {
+    position: relative;
+    min-height: 340px;
+    overflow: hidden;
+  }
+  .split-left {
+    background: linear-gradient(160deg, #0F172A 0%, #1E293B 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  .split-right {
+    background: #000;
+  }
+  .split-right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .split-label {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 3;
+  }
+
+  /* Node graph on left side */
+  .node-graph {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 320px;
+  }
+  .node-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .node-box {
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .node-box.green { border-color: rgba(59, 130, 246, 0.35); color: #60A5FA; }
+  .node-box.purple { border-color: rgba(139, 92, 246, 0.35); color: #A78BFA; }
+  .node-box.orange { border-color: rgba(96, 165, 250, 0.35); color: #3B82F6; }
+  .node-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .node-connector {
+    width: 2px; height: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    margin-left: 20px;
+  }
+
+  @media (max-width: 760px) {
+    .split-screen { grid-template-columns: 1fr; }
+    .split-side { min-height: 240px; }
+  }
+
+  /* ===== Stage 4: WIP Card ===== */
+  .wip-card {
+    background: linear-gradient(160deg, #1A1A1A 0%, #0D0D0D 100%);
+    border-radius: 26px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(96, 165, 250, 0.2),
+      0 0 60px rgba(96, 165, 250, 0.08),
+      0 24px 80px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .bts-item img.loaded, .bts-item video.loaded {
+    background: none;
+    animation: none;
+  }
+  .wip-card::before {
+    content: '';
+    position: absolute;
+    top: -30%; right: -10%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.12) 0%, transparent 60%);
+    filter: blur(30px);
+    animation: wipGlow 4s ease-in-out infinite;
+  }
+  @keyframes wipGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  .wip-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 2;
+  }
+  .wip-badge {
+    padding: 6px 16px;
+    border-radius: 100px;
+    background: rgba(96, 165, 250, 0.15);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    color: #3B82F6;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wip-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #3B82F6;
+    box-shadow: 0 0 10px #3B82F6;
+    animation: wipDot 1.5s ease-in-out infinite;
+  }
+  @keyframes wipDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .wip-title {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .wip-desc {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.8;
+    max-width: 580px;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Progress bar */
+  .progress-section {
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 2;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .progress-label-text {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .progress-label-val {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #3B82F6;
+  }
+  .progress-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #60A5FA 0%, #3B82F6 50%, #93C5FD 100%);
+    box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+    width: 0;
+    transition: width 2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .progress-fill.animated { width: 60%; }
+
+  /* WIP content grid */
+  .wip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 2;
+  }
+  .wip-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .wip-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wip-item-icon {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .wip-item-icon.done {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60A5FA;
+  }
+  .wip-item-icon.progress {
+    background: rgba(96, 165, 250, 0.15);
+    color: #3B82F6;
+  }
+  .wip-item-icon svg { width: 14px; height: 14px; }
+  .wip-item-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.05em;
+  }
+  .wip-item-status {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .wip-item-status.done { color: #60A5FA; }
+  .wip-item-status.progress { color: #3B82F6; }
+
+  /* Teaser */
+  .wip-teaser {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-radius: 14px;
+    background: rgba(96, 165, 250, 0.06);
+    border: 1px dashed rgba(96, 165, 250, 0.25);
+    position: relative;
+    z-index: 2;
+  }
+  .wip-teaser-text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  .wip-teaser-dots {
+    display: flex;
+    gap: 4px;
+  }
+  .wip-teaser-dots span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(96, 165, 250, 0.4);
+    animation: teaserDot 1.4s ease-in-out infinite;
+  }
+  .wip-teaser-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .wip-teaser-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes teaserDot {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  /* ===== MV Concept Showcase ===== */
+  .mv-showcase {
+    margin-top: 32px;
+  }
+  .mv-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 880px;
+  }
+  .mv-song {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    max-width: 880px;
+  }
+  .mv-song-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .mv-song-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ai-color);
+  }
+  .mv-song-icon svg { width: 18px; height: 18px; }
+  .mv-song-text { display: flex; flex-direction: column; gap: 2px; }
+  .mv-song-title { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+  .mv-song-label { font-size: 0.68rem; color: var(--muted); }
+  .mv-song-play {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--ai-color);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .mv-song-play:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+  }
+  .mv-song-play svg { width: 14px; height: 14px; }
+  .mv-song-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    position: relative;
+  }
+  .mv-song-bar-fill {
+    height: 100%;
+    width: 0;
+    background: var(--ai-color);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+  }
+  .mv-song-time {
+    font-family: "SF Mono", "JetBrains Mono", monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    min-width: 32px;
+    text-align: right;
+  }
+  @media (max-width: 768px) {
+    .mv-showcase-grid { grid-template-columns: repeat(2, 1fr); max-width: none; }
+    .mv-song { flex-wrap: wrap; }
+    .mv-song-bar { order: 4; flex-basis: 100%; margin-top: 8px; }
+  }
+  @media (max-width: 480px) {
+    .mv-showcase-grid { grid-template-columns: 1fr; max-width: none; }
+  }
+
+  @media (max-width: 760px) {
+    .wip-card { padding: 32px 24px; }
+    .wip-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ===== Scroll Reveal ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    padding: 60px 48px 40px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 1;
+    background: var(--bg);
+  }
+  .footer-brand {
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 760px) {
+    /* Nav */
+    .nav-links { gap: 14px; }
+    .nav-links a { font-size: 0.68rem; }
+    .nav-name { font-size: 0.9rem; }
+    .nav-title { display: none; }
+
+    /* Hero */
+    .hero { padding: 120px 20px 50px; min-height: 56vh; }
+    .hero-eyebrow { font-size: 0.65rem; margin-bottom: 16px; }
+    .hero-title-en { font-size: clamp(2rem, 9vw, 2.8rem) !important; }
+    .hero-title-zh { font-size: 0.95rem !important; }
+    .hero-slogan { font-size: 0.78rem !important; line-height: 1.7; }
+    .hero-eyebrow::before, .hero-eyebrow::after { width: 20px; }
+
+    /* Filter bar */
+    .filter-bar { top: 68px; padding: 8px 12px; gap: 6px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    .filter-tag { padding: 5px 12px; font-size: 0.65rem; white-space: nowrap; }
+
+    /* Stages */
+    .stages { padding: 30px 16px 60px; gap: 40px; }
+
+    /* Stage header */
+    .stage-header { flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .stage-num { font-size: 0.62rem; }
+    .stage-title { font-size: 1.3rem !important; margin-bottom: 6px; }
+    .stage-desc { font-size: 0.8rem !important; line-height: 1.7; margin-bottom: 20px; }
+
+    /* Music card */
+    .music-card { padding: 24px 20px; gap: 20px; }
+    .vinyl-wrap { width: 150px !important; height: 150px !important; }
+    .music-title { font-size: 1.2rem !important; }
+
+    /* Workflow */
+    .workflow-grid { grid-template-columns: 1fr; gap: 12px; }
+    .workflow-card { padding: 20px; min-height: 120px; border-radius: 18px; }
+
+    /* BTS section */
+    .bts-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+    .bts-item { aspect-ratio: 1 / 1 !important; }
+    .bts-item-overlay { opacity: 1 !important; transform: translateY(0) !important; }
+    .bts-item-name { font-size: 0.68rem; }
+    .bts-item-tag { font-size: 0.55rem; padding: 2px 6px; }
+
+    /* Split screen */
+    .split-screen { grid-template-columns: 1fr !important; }
+    .split-side { min-height: 200px; }
+    .split-left { padding: 24px; }
+    .node-graph { max-width: 100%; gap: 10px; }
+    .split-label { font-size: 0.6rem; bottom: 10px; left: 10px; padding: 4px 10px; }
+
+    /* WIP card */
+    .wip-card { padding: 24px 18px; }
+    .wip-grid { grid-template-columns: 1fr !important; gap: 10px; }
+    .wip-title { font-size: 1.4rem !important; }
+    .wip-desc { font-size: 0.8rem !important; }
+    .wip-item { padding: 14px; }
+
+    /* MV showcase */
+    .mv-showcase-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+    .bts-header { margin-bottom: 20px; }
+    .bts-header-title { font-size: 1.2rem; }
+    .bts-header-label { font-size: 0.6rem; }
+    .mv-song { flex-wrap: wrap; gap: 10px; }
+    .mv-song-bar { order: 4; flex-basis: 100%; margin-top: 6px; }
+    .mv-song-title { font-size: 0.85rem; }
+
+    /* Footer */
+    footer { padding: 30px 20px 24px; }
+    .footer-brand { font-size: 0.8rem; }
+  }
+
+  @media (max-width: 480px) {
+    /* Nav - hide brand, keep links */
+    .nav-brand { display: none; }
+    .nav-links { gap: 12px; }
+
+    /* Hero */
+    .hero { padding: 110px 16px 40px; }
+    .hero-title-en { font-size: 1.7rem !important; }
+
+    /* Filter */
+    .filter-bar { padding: 6px 10px; }
+
+    /* Music card */
+    .vinyl-wrap { width: 130px !important; height: 130px !important; }
+
+    /* BTS & MV grid - single column */
+    .bts-grid { grid-template-columns: 1fr !important; }
+    .mv-showcase-grid { grid-template-columns: 1fr !important; }
+
+    /* Split screen */
+    .split-side { min-height: 160px; }
+
+    /* WIP */
+    .wip-card { padding: 20px 14px; }
+    .wip-title { font-size: 1.2rem !important; }
+
+    /* Stages */
+    .stages { padding: 24px 12px 50px; gap: 32px; }
+    .stage-title { font-size: 1.15rem !important; }
+
+    /* Footer */
+    footer { padding: 24px 16px 20px; }
+  }
+
+  /* ===== Entrance Animations (fadeUp) ===== */
+  .top-nav { opacity: 0; animation: fadeUp 0.8s 0.1s forwards; }
+  .back-home-btn { opacity: 0; animation: fadeUp 0.8s 0.15s forwards; }
+  .hero-eyebrow { opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-title-en { opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+  .hero-title-zh { opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+  .hero-slogan { opacity: 0; animation: fadeUp 0.8s 0.5s forwards; }
+  .filter-bar { opacity: 0; animation: fadeUp 0.8s 0.6s forwards; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+<link rel="prefetch" href="index.html">
+<link rel="prefetch" href="films.html">
+<link rel="prefetch" href="concepts.html">
+<link rel="prefetch" href="visual.html">
+<link rel="preload" href="bts/img-phoenix.png" as="image">
+<link rel="preload" href="bts/img-flood-city.png" as="image">
+<link rel="prefetch" href="bts/vid-satellite.mp4" as="fetch">
+<link rel="prefetch" href="bts/vid-tear.mp4" as="fetch">
+<link rel="prefetch" href="music/ai-song.mp3" as="fetch">
+</head>
+<body>
+
+<!-- Background Canvas -->
+<div class="bg-canvas">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+  <div class="particles" id="particles"></div>
+</div>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">
+    <div class="nav-name">刘怡彤Sunny</div>
+    <div class="nav-title">Creative / AI Director</div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="index.html#archive">档案</a></li>
+    <li><a href="films.html">影像</a></li>
+    <li><a href="concepts.html">概念</a></li>
+    <li><a href="ai-lab.html" class="active">AI实验室</a></li>
+    <li><a href="visual.html">视觉</a></li>
+  </ul>
+</nav>
+
+<a href="index.html" class="back-home-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  <span>返回</span>
+</a>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-eyebrow mono">Creative Archive / 03</div>
+  <h1 class="hero-title-en">AI LAB</h1>
+  <div class="hero-title-zh">智能探索实验室</div>
+  <p class="hero-slogan">
+    从 <span class="highlight">"随机生成"</span> 到 <span class="highlight">"导演级可控"</span><br>
+    探索 AIGC 的无限可能。
+  </p>
+</section>
+
+<!-- Filter Tags -->
+<div class="filter-bar" id="filterBar">
+  <button class="filter-tag active" data-filter="all">全部</button>
+  <button class="filter-tag" data-filter="music">音乐</button>
+  <button class="filter-tag" data-filter="workflow">工作流</button>
+  <button class="filter-tag" data-filter="video">视频</button>
+</div>
+
+<!-- Stages -->
+<div class="stages">
+
+  <!-- Stage 1: Music -->
+  <div class="stage reveal" data-category="music">
+    <div class="stage-header">
+      <span class="stage-num mono">01</span>
+      <div class="stage-divider"></div>
+      <div class="stage-tags">
+        <span class="stage-tag">AI Music</span>
+        <span class="stage-tag">MiniMax</span>
+        <span class="stage-tag warm">网易云音乐</span>
+      </div>
+    </div>
+    <h2 class="stage-title">音乐初探 — 音频生成与发行</h2>
+    <p class="stage-desc">首次尝试 AI 音乐创作，使用 MiniMax 完成词曲与声线生成，作品已正式上线网易云音乐。</p>
+
+    <div class="music-card">
+      <div class="vinyl-wrap">
+        <div class="vinyl" id="vinyl"></div>
+        <div class="tonearm" id="tonearm">
+          <div class="tonearm-base"></div>
+          <div class="tonearm-bar"></div>
+          <div class="tonearm-head"></div>
+        </div>
+      </div>
+      <div class="music-info">
+        <div class="music-label">AI Music · MiniMax</div>
+        <div class="music-title">答案</div>
+        <div class="music-subtitle">词曲 / 声线 / 混音 全流程 AI 生成</div>
+
+        <audio id="audioPlayer" src="music/ai-song.mp3" preload="metadata"></audio>
+
+        <div class="waveform" id="waveform">
+          <!-- Wave bars generated by JS -->
+        </div>
+
+        <div class="music-controls">
+          <button class="play-btn" id="playBtn" aria-label="播放">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <a href="#" class="netease-btn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            网易云音乐
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 2: Workflow -->
+  <div class="stage reveal" data-category="workflow">
+    <div class="stage-header">
+      <span class="stage-num mono">02</span>
+      <div class="stage-divider"></div>
+      <div class="stage-tags">
+        <span class="stage-tag">Midjourney</span>
+        <span class="stage-tag">Runway</span>
+        <span class="stage-tag">ComfyUI</span>
+        <span class="stage-tag">Tapnow</span>
+        <span class="stage-tag">Lovart</span>
+      </div>
+    </div>
+    <h2 class="stage-title">工作流搭建 — 文生图 & 图生视频</h2>
+    <p class="stage-desc">前期自主摸索 Prompt 工程与工作流，多个 AI 视觉短片。</p>
+
+    <div class="workflow-grid">
+      <div class="workflow-card">
+        <div class="workflow-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/><polygon points="23 7 16 12 23 17 23 7" fill="currentColor" opacity="0.3"/></svg>
+        </div>
+        <div class="workflow-card-label">文生图 & 图生视频工作流</div>
+      </div>
+      <div class="workflow-card">
+        <div class="workflow-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <div class="workflow-card-label">ComfyUI 节点流</div>
+      </div>
+      <div class="workflow-card">
+        <div class="workflow-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="workflow-card-label">Prompt 工程</div>
+      </div>
+    </div>
+    <div class="workflow-reserve"></div>
+
+    <!-- Behind-the-Scenes Gallery -->
+    <div class="bts-section">
+      <div class="bts-header">
+        <span class="bts-header-label">Behind the Scenes</span>
+        <span class="bts-header-line"></span>
+        <span class="bts-header-title">幕后工作片段</span>
+      </div>
+      <div class="bts-grid">
+        <div class="bts-item" data-media="video">
+          <video src="bts/vid-tear.mp4" muted loop playsinline preload="metadata"></video>
+          <div class="bts-item-overlay">
+            <span class="bts-item-name">眼泪落地</span>
+            <span class="bts-item-tag">文图生视频</span>
+          </div>
+        </div>
+        <div class="bts-item" data-media="video">
+          <video src="bts/vid-satellite.mp4" muted loop playsinline preload="metadata"></video>
+          <div class="bts-item-overlay">
+            <span class="bts-item-name">卫星俯瞰重庆</span>
+            <span class="bts-item-tag">文图生视频</span>
+          </div>
+        </div>
+        <div class="bts-item" data-media="image">
+          <img src="bts/img-phoenix.png" alt="凤凰涅槃" loading="eager" decoding="async">
+          <div class="bts-item-overlay">
+            <span class="bts-item-name">凤凰涅槃</span>
+            <span class="bts-item-tag">文生图</span>
+          </div>
+        </div>
+        <div class="bts-item" data-media="image">
+          <img src="bts/img-flood-city.png" alt="洪水城市" loading="eager" decoding="async">
+          <div class="bts-item-overlay">
+            <span class="bts-item-name">洪水城市</span>
+            <span class="bts-item-tag">文生图</span>
+          </div>
+        </div>
+        <div class="bts-item" data-media="video">
+          <video src="bts/vid-hotpot-pixel.mp4" muted loop playsinline preload="metadata"></video>
+          <div class="bts-item-overlay">
+            <span class="bts-item-name">像素火锅</span>
+            <span class="bts-item-tag">文图生视频</span>
+          </div>
+        </div>
+        <div class="bts-item" data-media="image">
+          <img src="bts/img-chongqing-valley.png" alt="重庆谷物语" loading="lazy" decoding="async">
+          <div class="bts-item-overlay">
+            <span class="bts-item-name">重庆谷物语</span>
+            <span class="bts-item-tag">文生图</span>
+          </div>
+        </div>
+        <div class="bts-item" data-media="image">
+          <img src="bts/img-monster-store.png" alt="超市异变" loading="lazy" decoding="async">
+          <div class="bts-item-overlay">
+            <span class="bts-item-name">超市异变</span>
+            <span class="bts-item-tag">文生图</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 3: Advanced Control -->
+  <div class="stage reveal" data-category="video">
+    <div class="stage-header">
+      <span class="stage-num mono">03</span>
+      <div class="stage-divider"></div>
+      <div class="stage-tags">
+        <span class="stage-tag purple">3D & AE</span>
+        <span class="stage-tag warm">混合剪辑</span>
+      </div>
+    </div>
+    <h2 class="stage-title">进阶可控 — AI 导演台 + 3D + AE 综合实战</h2>
+    <p class="stage-desc">突破传统生成式 AI 的随机性盲盒限制，结合 3D 建模、AE 后期跟踪与 AI 导演台，实现高精度、高可控度的运镜与画面调度。</p>
+
+    <div class="split-screen">
+      <div class="split-side split-left">
+        <div class="split-label">工作流 / 3D 节点</div>
+        <div class="node-graph">
+          <div class="node-row"><div class="node-box green"><span class="node-dot"></span>AI 导演台</div></div>
+          <div class="node-connector"></div>
+          <div class="node-row"><div class="node-box purple"><span class="node-dot"></span>3D 建模</div></div>
+          <div class="node-connector"></div>
+          <div class="node-row"><div class="node-box orange"><span class="node-dot"></span>AE 跟踪</div></div>
+          <div class="node-connector"></div>
+          <div class="node-row"><div class="node-box green"><span class="node-dot"></span>合成输出</div></div>
+        </div>
+      </div>
+      <div class="split-side split-right">
+        <div class="split-label">渲染成品</div>
+        <img src="images/ai-lab-stage3.jpg" alt="3D + AE 综合实战渲染成品">
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 4: WIP -->
+  <div class="stage reveal" data-category="video">
+    <div class="stage-header">
+      <span class="stage-num mono">04</span>
+      <div class="stage-divider"></div>
+      <div class="stage-tags">
+        <span class="stage-tag warm">In Progress</span>
+        <span class="stage-tag">Full-length MV</span>
+        <span class="stage-tag">Original IP</span>
+      </div>
+    </div>
+    <h2 class="stage-title">在研大作 — 概念 MV 项目</h2>
+    <p class="stage-desc">原创全时长概念 MV，融合 AI 音乐、AI 视觉与原创 IP 叙事。</p>
+
+    <div class="wip-card">
+      <div class="wip-header">
+        <span class="wip-badge">项目进行中</span>
+      </div>
+      <h3 class="wip-title">概念 MV — Original IP</h3>
+      <p class="wip-desc">融合 AI 辅助创作与导演级把控的原创音乐短片，探索技术美学与叙事表达的边界。</p>
+
+      <div class="progress-section">
+        <div class="progress-label">
+          <span class="progress-label-text">项目进度</span>
+          <span class="progress-label-val">60%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="wip-grid">
+        <div class="wip-item">
+          <div class="wip-item-header">
+            <div class="wip-item-icon done">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="wip-item-label">原创歌曲</span>
+          </div>
+          <span class="wip-item-status done">已完成</span>
+        </div>
+        <div class="wip-item">
+          <div class="wip-item-header">
+            <div class="wip-item-icon done">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="wip-item-label">核心角色 IP 形象</span>
+          </div>
+          <span class="wip-item-status done">已完成</span>
+        </div>
+        <div class="wip-item">
+          <div class="wip-item-header">
+            <div class="wip-item-icon done">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="wip-item-label">场景概念设计图</span>
+          </div>
+          <span class="wip-item-status done">已完成</span>
+        </div>
+      </div>
+      <div class="wip-grid">
+        <div class="wip-item">
+          <div class="wip-item-header">
+            <div class="wip-item-icon progress">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <span class="wip-item-label">分镜动画渲染</span>
+          </div>
+          <span class="wip-item-status progress">进行中</span>
+        </div>
+        <div class="wip-item">
+          <div class="wip-item-header">
+            <div class="wip-item-icon progress">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <span class="wip-item-label">动态视频合成</span>
+          </div>
+          <span class="wip-item-status progress">进行中</span>
+        </div>
+      </div>
+
+      <!-- MV Concept Showcase -->
+      <div class="mv-showcase">
+        <div class="bts-header">
+          <span class="bts-header-label">Concept MV Assets</span>
+          <span class="bts-header-line"></span>
+          <span class="bts-header-title">概念MV素材</span>
+        </div>
+        <div class="mv-showcase-grid">
+          <div class="bts-item">
+            <img src="bts/mv-character.png" alt="核心角色IP形象" loading="lazy" decoding="async">
+            <div class="bts-item-overlay">
+              <span class="bts-item-name">核心角色 IP 形象</span>
+              <span class="bts-item-tag">角色设定</span>
+            </div>
+          </div>
+          <div class="bts-item">
+            <img src="bts/mv-scene-palace.png" alt="天空宫殿场景" loading="lazy" decoding="async">
+            <div class="bts-item-overlay">
+              <span class="bts-item-name">天空宫殿</span>
+              <span class="bts-item-tag">场景概念</span>
+            </div>
+          </div>
+          <div class="bts-item">
+            <img src="bts/mv-scene-digital.png" alt="数字幻境场景" loading="lazy" decoding="async">
+            <div class="bts-item-overlay">
+              <span class="bts-item-name">数字幻境</span>
+              <span class="bts-item-tag">场景概念</span>
+            </div>
+          </div>
+          <div class="bts-item">
+            <img src="bts/mv-prop-bow.png" alt="丘比特之弓道具" loading="lazy" decoding="async">
+            <div class="bts-item-overlay">
+              <span class="bts-item-name">丘比特之弓</span>
+              <span class="bts-item-tag">道具设计</span>
+            </div>
+          </div>
+        </div>
+        <div class="mv-song">
+          <div class="mv-song-info">
+            <div class="mv-song-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+            <div class="mv-song-text">
+              <span class="mv-song-title">Pink Static</span>
+              <span class="mv-song-label">概念MV原声</span>
+            </div>
+          </div>
+          <button class="mv-song-play" id="mvSongBtn" aria-label="播放">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div class="mv-song-bar"><div class="mv-song-bar-fill" id="mvSongBar"></div></div>
+          <span class="mv-song-time" id="mvSongTime">0:00</span>
+        </div>
+        <audio id="mvAudio" src="music/pink-static.mp3" preload="metadata"></audio>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ===== Filter Tags =====
+  const filterTags = document.querySelectorAll('.filter-tag');
+  const stages = document.querySelectorAll('.stage');
+
+  filterTags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      filterTags.forEach(t => t.classList.remove('active'));
+      tag.classList.add('active');
+      const filter = tag.dataset.filter;
+
+      stages.forEach(stage => {
+        const cat = stage.dataset.category;
+        if (filter === 'all' || cat === filter) {
+          stage.classList.remove('hidden');
+        } else {
+          stage.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // ===== Scroll Reveal =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Trigger progress bar animation
+        if (entry.target.querySelector('#progressFill')) {
+          setTimeout(() => {
+            entry.target.querySelector('#progressFill').classList.add('animated');
+          }, 400);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ===== Image Load Detection =====
+  document.querySelectorAll('.bts-item img').forEach(function(img) {
+    if (img.complete) {
+      img.classList.add('loaded');
+    } else {
+      img.addEventListener('load', function() { img.classList.add('loaded'); });
+      img.addEventListener('error', function() { img.classList.add('loaded'); });
+    }
+  });
+  document.querySelectorAll('.bts-item video').forEach(function(v) {
+    v.addEventListener('loadeddata', function() { v.classList.add('loaded'); });
+    v.addEventListener('error', function() { v.classList.add('loaded'); });
+  });
+
+  // ===== BTS Video Autoplay on Scroll =====
+  const btsVideos = document.querySelectorAll('.bts-item video');
+  const videoObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      const v = entry.target;
+      if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+        if (v.readyState === 0 && v.src) {
+          v.load();
+        }
+        v.play().catch(function() {});
+      } else {
+        v.pause();
+      }
+    });
+  }, { threshold: [0, 0.3, 0.6] });
+  btsVideos.forEach(function(v) { videoObserver.observe(v); });
+
+  // ===== Music Player =====
+  const vinyl = document.getElementById('vinyl');
+  const tonearm = document.getElementById('tonearm');
+  const playBtn = document.getElementById('playBtn');
+  const waveform = document.getElementById('waveform');
+  const audio = document.getElementById('audioPlayer');
+  let isPlaying = false;
+
+  // Generate waveform bars
+  for (let i = 0; i < 64; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'wave-bar';
+    const height = 15 + Math.random() * 85;
+    bar.style.height = height + '%';
+    waveform.appendChild(bar);
+  }
+
+  const waveBars = document.querySelectorAll('.wave-bar');
+  let waveTimer = null;
+  let waveIdx = 0;
+
+  function startWave() {
+    waveTimer = setInterval(() => {
+      waveBars.forEach(b => b.classList.remove('active'));
+      const range = 8;
+      for (let i = 0; i < range; i++) {
+        const idx = (waveIdx + i) % waveBars.length;
+        waveBars[idx].classList.add('active');
+        waveBars[idx].style.height = (15 + Math.random() * 85) + '%';
+      }
+      waveIdx++;
+    }, 120);
+  }
+
+  function stopWave() {
+    clearInterval(waveTimer);
+    waveBars.forEach(b => b.classList.remove('active'));
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play().catch(function(err) {
+        console.log('Audio play failed:', err);
+      });
+    }
+  });
+
+  audio.addEventListener('play', () => {
+    isPlaying = true;
+    vinyl.classList.add('playing');
+    tonearm.classList.add('playing');
+    playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
+    startWave();
+  });
+
+  audio.addEventListener('pause', () => {
+    isPlaying = false;
+    vinyl.classList.remove('playing');
+    tonearm.classList.remove('playing');
+    playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    stopWave();
+  });
+
+  audio.addEventListener('ended', () => {
+    isPlaying = false;
+    vinyl.classList.remove('playing');
+    tonearm.classList.remove('playing');
+    playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    stopWave();
+  });
+
+  // ===== MV Song Player =====
+  const mvBtn = document.getElementById('mvSongBtn');
+  const mvAudio = document.getElementById('mvAudio');
+  const mvBar = document.getElementById('mvSongBar');
+  const mvTime = document.getElementById('mvSongTime');
+  let mvPlaying = false;
+
+  function fmtTime(s) {
+    if (!s || isNaN(s)) return '0:00';
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' + sec : sec);
+  }
+
+  mvBtn.addEventListener('click', function() {
+    if (!mvAudio) return;
+    if (mvPlaying) { mvAudio.pause(); } else { mvAudio.play().catch(function() {}); }
+  });
+
+  mvAudio.addEventListener('play', function() {
+    mvPlaying = true;
+    mvBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
+  });
+
+  mvAudio.addEventListener('pause', function() {
+    mvPlaying = false;
+    mvBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  });
+
+  mvAudio.addEventListener('ended', function() {
+    mvPlaying = false;
+    mvBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    mvBar.style.width = '0%';
+    mvTime.textContent = '0:00';
+  });
+
+  mvAudio.addEventListener('timeupdate', function() {
+    if (mvAudio.duration) {
+      mvBar.style.width = (mvAudio.currentTime / mvAudio.duration * 100) + '%';
+      mvTime.textContent = fmtTime(mvAudio.currentTime);
+    }
+  });
+</script>
+
+<!-- Footer -->
+<footer id="contact">
+  <div class="footer-brand">刘怡彤Sunny</div>
+  <p>Creative / AI Director · All rights reserved</p>
+</footer>
+
+<script>
+  // ===== Particle System =====
+  const particlesContainer = document.getElementById('particles');
+  if (particlesContainer) {
+    for (let i = 0; i < 12; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDuration = (15 + Math.random() * 20) + 's';
+      p.style.animationDelay = (Math.random() * 15) + 's';
+      particlesContainer.appendChild(p);
+    }
+  }
+</script>
+
+</body>
+</html>

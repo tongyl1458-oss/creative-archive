@@ -1,0 +1,21 @@
+node_modules/
+dist/
+*.log
+
+# Exclude embedded git repo internals
+public/creative-archive/.git/
+public/creative-archive/objects/
+public/creative-archive/hooks/
+public/creative-archive/refs/
+public/creative-archive/logs/
+public/creative-archive/info/
+public/creative-archive/config
+public/creative-archive/HEAD
+public/creative-archive/description
+public/creative-archive/index
+public/creative-archive/COMMIT_EDITMSG
+
+# Exclude large video files
+public/creative-archive/videos/*.mp4
+public/creative-archive/bts/*.mp4
+public/creative-archive/music/*.mp3

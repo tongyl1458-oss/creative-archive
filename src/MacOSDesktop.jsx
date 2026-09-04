@@ -26,13 +26,6 @@ function SubpagePreloader({ visible }) {
     const resources = [
       { href: `${BASE}creative-archive/videos/chongqing-cover.png`, as: 'image', rel: 'preload' },
       { href: `${BASE}creative-archive/videos/luosifen-cover.png`, as: 'image', rel: 'preload' },
-      { href: `${BASE}creative-archive/videos/chongqing.mp4`, as: 'video', rel: 'prefetch' },
-      { href: `${BASE}creative-archive/videos/ai-science.mp4`, as: 'fetch', rel: 'prefetch' },
-      { href: `${BASE}creative-archive/videos/ai-kunpeng.mp4`, as: 'fetch', rel: 'prefetch' },
-      { href: `${BASE}creative-archive/videos/ai-puppy.mp4`, as: 'fetch', rel: 'prefetch' },
-      { href: `${BASE}creative-archive/videos/ai-luosifen-ad.mp4`, as: 'fetch', rel: 'prefetch' },
-      { href: `${BASE}creative-archive/videos/ai-chongqing-stardew.mp4`, as: 'fetch', rel: 'prefetch' },
-      { href: `${BASE}creative-archive/music/ai-song.mp3`, as: 'fetch', rel: 'prefetch' },
       { href: `${BASE}desktop-pet/app-icon.png`, as: 'image', rel: 'preload' },
       { href: `${BASE}desktop-pet/minesweeper-icon.png`, as: 'image', rel: 'preload' },
     ]

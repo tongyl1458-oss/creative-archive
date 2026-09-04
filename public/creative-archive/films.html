@@ -939,11 +939,6 @@
 <link rel="prefetch" href="visual.html">
 <link rel="preload" href="videos/chongqing-cover.png" as="image">
 <link rel="preload" href="videos/luosifen-cover.png" as="image">
-<link rel="prefetch" href="videos/ai-science.mp4" as="fetch">
-<link rel="prefetch" href="videos/ai-kunpeng.mp4" as="fetch">
-<link rel="prefetch" href="videos/ai-puppy.mp4" as="fetch">
-<link rel="prefetch" href="videos/ai-chongqing-stardew.mp4" as="fetch">
-<link rel="prefetch" href="videos/ai-luosifen-ad.mp4" as="fetch">
 </head>
 <body>
   
@@ -1015,7 +1010,7 @@
     <div class="video-player" id="videoPlayer">
       <div class="video-container">
         <div class="video-cover" id="videoCover">
-          <video class="cover-video" id="coverVideo" src="videos/chongqing.mp4#t=0.5" muted preload="metadata" poster="videos/chongqing-cover.png" playsinline></video>
+          <video class="cover-video" id="coverVideo" src="" poster="videos/chongqing-cover.png" muted preload="none" playsinline></video>
           <img class="cover-video" id="coverImage" src="" style="display:none; object-fit:cover; width:100%; height:100%;">
           <div class="play-button" id="playButton">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1044,7 +1039,7 @@
     <div class="player-card">
       <!-- Video area -->
       <div class="player-video-wrap" id="playerVideoWrap">
-        <video class="player-video" id="modalVideo" preload="auto" playsinline></video>
+        <video class="player-video" id="modalVideo" preload="none" playsinline></video>
         <div class="player-play-overlay" id="modalPlayOverlay">
           <div class="player-play-btn-large">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1490,7 +1485,7 @@
         if (video.coverIsImage) {
           coverHtml = `<img src="${video.cover}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
         } else {
-          coverHtml = `<video src="${video.cover}" muted preload="metadata" playsinline></video>`;
+          coverHtml = `<video src="${video.cover}" muted preload="none" playsinline></video>`;
         }
         
         thumb.innerHTML = `
@@ -1503,15 +1498,6 @@
         thumb.addEventListener('dblclick', () => { selectVideo(index); playVideo(); });
         ring.appendChild(thumb);
       });
-
-      // Seek video thumbnails to first frame for cover display
-      setTimeout(() => {
-        document.querySelectorAll('.thumbnail-inner video').forEach(v => {
-          v.addEventListener('loadeddata', () => {
-            v.currentTime = 0.5;
-          });
-        });
-      }, 100);
     }
     
     // Play video - open modal with card-style player

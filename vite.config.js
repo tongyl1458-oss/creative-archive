@@ -8,11 +8,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
-          'vendor-postprocessing': ['@react-three/postprocessing', 'postprocessing'],
-          'vendor-icons': ['lucide-react'],
-          'vendor-utils': ['gsap'],
+        manualChunks(id) {
+          if (!id.includes('node_modules/')) return
+          if (id.includes('postprocessing')) return 'vendor-postprocessing'
+          if (id.includes('three')) return 'vendor-three'
+          if (id.includes('lucide-react')) return 'vendor-icons'
+          if (id.includes('gsap')) return 'vendor-utils'
         },
       },
     },

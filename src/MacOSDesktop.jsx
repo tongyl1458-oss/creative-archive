@@ -303,6 +303,12 @@ function MacWindow({ title, onClose, children, width = 560, height = 420, initia
           <div className="mac-window-title">{title}</div>
           <div style={{ width: 60 }}></div>
         </div>
+        <div className="mac-mobile-close" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </div>
         <div className="mac-window-content" style={{ padding: 0, height: 'calc(100vh - 36px)', overflow: 'hidden' }}>
           {children}
         </div>
@@ -320,6 +326,12 @@ function MacWindow({ title, onClose, children, width = 560, height = 420, initia
         </div>
         <div className="mac-window-title">{title}</div>
         <div style={{ width: 60 }}></div>
+      </div>
+      <div className="mac-mobile-close" onClick={onClose}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
       </div>
       <div className="mac-window-content" style={{ padding: 0, height: height - 36, overflow: 'hidden' }}>
         {children}
@@ -415,7 +427,7 @@ function WelcomeContent({ onOpen }) {
         }}>嗨~欢迎来到我的网络空间</div>
         <div style={{
           fontSize: '0.92rem', color: '#86868B', lineHeight: 1.6,
-        }}>点击下方图标开始探索吧！</div>
+        }}>点击左上角红色按钮开始探索吧！</div>
       </div>
     </div>
   )

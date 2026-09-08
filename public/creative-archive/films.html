@@ -1430,11 +1430,10 @@
         coverImage.src = video.cover;
       } else {
         coverImage.style.display = 'none';
-        coverVideo.style.display = 'block';
-        coverVideo.src = video.videoSrc;
-        coverVideo.load();
+        coverVideo.style.display = 'none';
+        coverVideo.removeAttribute('src');
       }
-      
+
       // Update title
       document.getElementById('videoTitleOverlay').textContent = video.title;
       
@@ -1507,9 +1506,11 @@
         // Use image or video for cover
         let coverHtml = '';
         if (video.coverIsImage) {
-          coverHtml = `<img src="${video.cover}" onerror="this.outerHTML='<div class=\\'thumb-fallback\\'>▶</div>'" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+          coverHtml = `<img src="${video.cover}" onerror="this.outerHTML='<div class=\\'thumb-fallback\\'>${video.title}</div>'" style="width:100%;height:100%;object-fit:cover;display:block;">`;
         } else {
-          coverHtml = `<video src="${video.cover}" muted preload="metadata" playsinline onerror="this.outerHTML='<div class=\\'thumb-fallback\\'>▶</div>'" onloadeddata="this.style.background='transparent'"></video>`;
+          const gradients = ['#3B82F6,#1E40AF', '#8B5CF6,#5B21B6', '#10B981,#047857', '#F59E0B,#92400E'];
+          const g = gradients[index % gradients.length];
+          coverHtml = `<div class="thumb-fallback" style="background:linear-gradient(135deg,${g});color:rgba(255,255,255,0.85);font-size:0.6rem;text-align:center;padding:4px;display:flex;align-items:center;justify-content:center;font-weight:600;">${video.title}</div>`;
         }
         
         thumb.innerHTML = `

@@ -1,7 +1,7 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Environment, ContactShadows, RoundedBox, Sparkles, Html, useProgress } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
-import { Suspense, useRef, useState, useEffect, useMemo } from 'react'
+import { Suspense, useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -439,6 +439,7 @@ function Scene({ bloomRef }) {
 function App() {
   const bloomRef = useRef()
   const heroRef = useRef()
+  const touchStartY = useRef(null)
   const [scrollPct, setScrollPct] = useState(0)
 
   useEffect(() => {
@@ -471,6 +472,13 @@ function App() {
 
   // macOS desktop fades in at 85%+ scroll
   const macDesktopVisible = scrollPct > 0.85
+
+  const enterDesktop = () => {
+    if (heroRef.current) {
+      const targetY = window.innerHeight * 1.8
+      window.scrollTo({ top: targetY, behavior: 'smooth' })
+    }
+  }
 
   return (
     <div className="app">
@@ -521,12 +529,28 @@ function App() {
           </p>
         </div>
 
-        {/* Scroll hint - mouse scroll icon */}
-        <div className="scroll-hint" style={{ opacity: Math.max(0, 1 - scrollPct * 10) }}>
+        {/* Scroll hint - clickable button + touch gesture */}
+        <div
+          className="scroll-hint scroll-hint-clickable"
+          style={{ opacity: Math.max(0, 1 - scrollPct * 10) }}
+          onClick={enterDesktop}
+          onTouchStart={(e) => {
+            touchStartY.current = e.touches[0].clientY
+          }}
+          onTouchEnd={(e) => {
+            if (touchStartY.current === null) return
+            const endY = e.changedTouches[0].clientY
+            const deltaY = touchStartY.current - endY
+            if (deltaY > 30) {
+              enterDesktop()
+            }
+            touchStartY.current = null
+          }}
+        >
           <div className="scroll-mouse">
             <div className="scroll-wheel"></div>
           </div>
-          <span>滚动以进入</span>
+          <span>滑动或点击进入</span>
         </div>
 
         {/* Screen immersion overlay - blue glow when entering screen */}

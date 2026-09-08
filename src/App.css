@@ -150,6 +150,17 @@ body {
   pointer-events: none;
   transition: opacity 0.1s linear;
 }
+.scroll-hint-clickable {
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.scroll-hint-clickable:active {
+  transform: translateX(-50%) scale(0.95);
+}
 
 .scroll-hint span {
   font-family: 'SF Mono', 'Monaco', monospace;

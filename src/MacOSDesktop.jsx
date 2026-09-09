@@ -10,53 +10,79 @@ import './MacOSDesktop.css'
 
 const BASE = import.meta.env.BASE_URL
 
-/* ===== Subpage Preloader — silent hidden iframes + resource prefetch ===== */
+/* ===== Subpage Preloader — prefetch HTML + preload images/videos ===== */
 function SubpagePreloader({ visible }) {
   const [active, setActive] = useState(false)
+  const [iframePhase, setIframePhase] = useState(0)
 
   useEffect(() => {
     if (!visible) return
-    const timer = setTimeout(() => setActive(true), 2000)
+    const timer = setTimeout(() => setActive(true), 300)
     return () => clearTimeout(timer)
   }, [visible])
 
   useEffect(() => {
     if (!active) return
 
-    const resources = [
-      { href: `${BASE}creative-archive/videos/chongqing-cover.png`, as: 'image', rel: 'preload' },
-      { href: `${BASE}creative-archive/videos/luosifen-cover.png`, as: 'image', rel: 'preload' },
-      { href: `${BASE}desktop-pet/app-icon.png`, as: 'image', rel: 'preload' },
-      { href: `${BASE}desktop-pet/minesweeper-icon.png`, as: 'image', rel: 'preload' },
+    const images = [
+      `${BASE}creative-archive/videos/chongqing-cover.png`,
+      `${BASE}creative-archive/videos/luosifen-cover.png`,
+      `${BASE}desktop-pet/app-icon.png`,
+      `${BASE}desktop-pet/minesweeper-icon.png`,
+      `${BASE}desktop-pet/cat2.png`,
+      `${BASE}desktop-pet/foods.png`,
+      `${BASE}desktop-pet/bowl.png`,
+      `${BASE}desktop-pet/heart_bubble.png`,
     ]
 
-    const links = resources.map(r => {
-      const link = document.createElement('link')
-      link.rel = r.rel
-      link.href = r.href
-      link.as = r.as
-      if (r.rel === 'preload') link.fetchpriority = 'low'
-      document.head.appendChild(link)
-      return link
+    const htmlPages = [
+      `${BASE}creative-archive/creative-archive.html`,
+      `${BASE}creative-archive/concepts.html`,
+      `${BASE}creative-archive/ai-lab.html`,
+      `${BASE}creative-archive/visual.html`,
+      `${BASE}minesweeper/index.html`,
+    ]
+
+    const links = []
+
+    images.forEach(href => {
+      const l = document.createElement('link')
+      l.rel = 'preload'
+      l.href = href
+      l.as = 'image'
+      l.fetchpriority = 'low'
+      document.head.appendChild(l)
+      links.push(l)
+    })
+
+    htmlPages.forEach(href => {
+      const l = document.createElement('link')
+      l.rel = 'prefetch'
+      l.href = href
+      document.head.appendChild(l)
+      links.push(l)
     })
 
     return () => { links.forEach(l => l.remove()) }
   }, [active])
 
-  const urls = [
-    `${BASE}creative-archive/creative-archive.html`,
+  const iframeUrls = [
     `${BASE}creative-archive/films.html`,
-    `${BASE}creative-archive/concepts.html`,
-    `${BASE}creative-archive/ai-lab.html`,
-    `${BASE}creative-archive/visual.html`,
-    `${BASE}minesweeper/index.html`,
+    `${BASE}creative-archive/creative-archive.html`,
   ]
+
+  useEffect(() => {
+    if (!active) return
+    if (iframePhase >= iframeUrls.length) return
+    const timer = setTimeout(() => setIframePhase(p => p + 1), 800)
+    return () => clearTimeout(timer)
+  }, [active, iframePhase])
 
   if (!active) return null
 
   return (
     <div style={{ position: 'fixed', top: -9999, left: -9999, width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
-      {urls.map((src, i) => (
+      {iframeUrls.slice(0, iframePhase).map((src, i) => (
         <iframe key={i} src={src} style={{ width: 1, height: 1, border: 'none' }} title={`preload-${i}`} />
       ))}
     </div>

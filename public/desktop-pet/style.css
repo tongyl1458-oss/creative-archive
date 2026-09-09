@@ -9,6 +9,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   background: transparent !important;
+  pointer-events: none;
 }
 
 #petCanvas {
@@ -19,5 +20,5 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
-  pointer-events: none;
+  pointer-events: auto;
 }

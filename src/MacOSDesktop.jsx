@@ -556,7 +556,7 @@ export default function MacOSDesktop({ visible }) {
             position: 'fixed', top: 0, left: 0,
             width: '100vw', height: '100vh',
             border: 'none', zIndex: 4,
-            pointerEvents: 'none',
+            pointerEvents: 'auto',
           }}
           title="Desktop Pet"
         />

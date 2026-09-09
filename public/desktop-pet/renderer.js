@@ -650,12 +650,24 @@ function updateState(dt) {
 function updateCanvasPosition() {
   canvas.style.left = Math.round(petX) + 'px';
   canvas.style.top = Math.round(petY) + 'px';
+  // Send position to parent for overlay hit-testing
+  window.parent.postMessage({
+    type: 'pet-position',
+    x: Math.round(petX),
+    y: Math.round(petY),
+    w: canvasWidth,
+    h: canvasHeight
+  }, '*');
 }
 
 function setupInteraction() {
-  canvas.addEventListener('mousedown', (e) => {
-    if (e.button === 0) {
-      e.preventDefault();
+  // All mouse interaction is handled by parent window (overlay div)
+  // Parent forwards events via postMessage since iframe has pointer-events: none
+  window.addEventListener('message', (e) => {
+    const d = e.data;
+    if (!d || !d.type) return;
+
+    if (d.type === 'pet-mousedown') {
       lastInteractionTime = Date.now();
       if (isSleeping) {
         isSleeping = false;
@@ -663,47 +675,37 @@ function setupInteraction() {
         return;
       }
       isDragging = true;
-      dragOffsetX = e.clientX - petX;
-      dragOffsetY = e.clientY - petY;
+      dragOffsetX = d.offsetX;
+      dragOffsetY = d.offsetY;
       waiting = false;
       setState(STATE.IDLE);
-    }
-  });
-
-  window.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-      petX = e.clientX - dragOffsetX;
-      petY = e.clientY - dragOffsetY;
-      petX = Math.max(0, Math.min(screenW - canvasWidth, petX));
-      petY = Math.max(0, Math.min(screenH - canvasHeight, petY));
-      updateCanvasPosition();
-    }
-  });
-
-  window.addEventListener('mouseup', (e) => {
-    if (e.button === 0 && isDragging) {
-      isDragging = false;
-      setState(STATE.WALK);
-    }
-  });
-
-  canvas.addEventListener('dblclick', () => {
-    lastInteractionTime = Date.now();
-    const actions = charConfig.doubleClickActions;
-    let r = Math.random();
-    let cumulative = 0;
-    for (const a of actions) {
-      cumulative += a.weight;
-      if (r <= cumulative) {
-        setState(a.state);
-        return;
+    } else if (d.type === 'pet-drag-move') {
+      if (isDragging) {
+        petX = d.x - dragOffsetX;
+        petY = d.y - dragOffsetY;
+        petX = Math.max(0, Math.min(screenW - canvasWidth, petX));
+        petY = Math.max(0, Math.min(screenH - canvasHeight, petY));
+        updateCanvasPosition();
       }
+    } else if (d.type === 'pet-drag-end') {
+      if (isDragging) {
+        isDragging = false;
+        setState(STATE.WALK);
+      }
+    } else if (d.type === 'pet-dblclick') {
+      lastInteractionTime = Date.now();
+      const actions = charConfig.doubleClickActions;
+      let r = Math.random();
+      let cumulative = 0;
+      for (const a of actions) {
+        cumulative += a.weight;
+        if (r <= cumulative) {
+          setState(a.state);
+          return;
+        }
+      }
+      setState(STATE.IDLE);
     }
-    setState(STATE.IDLE);
-  });
-
-  canvas.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
   });
 }
 

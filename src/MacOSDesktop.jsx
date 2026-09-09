@@ -471,16 +471,84 @@ export default function MacOSDesktop({ visible }) {
   const [welcomeShown, setWelcomeShown] = useState(false)
   const [showPet, setShowPet] = useState(false)
   const [minesweeperSize, setMinesweeperSize] = useState({ width: 300, height: 420 })
+  const petOverlayRef = useRef(null)
+  const petBoundsRef = useRef({ x: 0, y: 0, w: 96, h: 96 })
+  const petDraggingRef = useRef(false)
 
   useEffect(() => {
     function handleMessage(e) {
       if (e.data && e.data.type === 'minesweeper-resize') {
         setMinesweeperSize({ width: e.data.width, height: e.data.height })
       }
+      if (e.data && e.data.type === 'pet-position') {
+        petBoundsRef.current = { x: e.data.x, y: e.data.y, w: e.data.w, h: e.data.h }
+        if (petOverlayRef.current) {
+          petOverlayRef.current.style.left = e.data.x + 'px'
+          petOverlayRef.current.style.top = e.data.y + 'px'
+          petOverlayRef.current.style.width = e.data.w + 'px'
+          petOverlayRef.current.style.height = e.data.h + 'px'
+        }
+      }
     }
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
   }, [])
+
+  // Pet interaction: overlay div captures mouse, forwards to iframe via postMessage
+  useEffect(() => {
+    if (!showPet) return
+
+    const getIframe = () => document.querySelector('iframe[title="Desktop Pet"]')
+
+    const handleMouseDown = (e) => {
+      if (e.button !== 0) return
+      const { x, y, w, h } = petBoundsRef.current
+      if (e.clientX >= x && e.clientX <= x + w && e.clientY >= y && e.clientY <= y + h) {
+        e.preventDefault()
+        e.stopPropagation()
+        petDraggingRef.current = true
+        getIframe()?.contentWindow?.postMessage({
+          type: 'pet-mousedown',
+          offsetX: e.clientX - x,
+          offsetY: e.clientY - y
+        }, '*')
+      }
+    }
+
+    const handleMouseMove = (e) => {
+      if (!petDraggingRef.current) return
+      getIframe()?.contentWindow?.postMessage({
+        type: 'pet-drag-move',
+        x: e.clientX,
+        y: e.clientY
+      }, '*')
+    }
+
+    const handleMouseUp = () => {
+      if (!petDraggingRef.current) return
+      petDraggingRef.current = false
+      getIframe()?.contentWindow?.postMessage({ type: 'pet-drag-end' }, '*')
+    }
+
+    const handleDblClick = (e) => {
+      const { x, y, w, h } = petBoundsRef.current
+      if (e.clientX >= x && e.clientX <= x + w && e.clientY >= y && e.clientY <= y + h) {
+        getIframe()?.contentWindow?.postMessage({ type: 'pet-dblclick' }, '*')
+      }
+    }
+
+    window.addEventListener('mousedown', handleMouseDown, true)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('dblclick', handleDblClick)
+
+    return () => {
+      window.removeEventListener('mousedown', handleMouseDown, true)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('dblclick', handleDblClick)
+    }
+  }, [showPet])
 
   useEffect(() => {
     if (visible && !welcomeShown) {
@@ -576,16 +644,29 @@ export default function MacOSDesktop({ visible }) {
 
       {/* Desktop Pet walking freely on desktop */}
       {showPet && (
-        <iframe
-          src={`${BASE}desktop-pet/index.html`}
-          style={{
-            position: 'fixed', top: 0, left: 0,
-            width: '100vw', height: '100vh',
-            border: 'none', zIndex: 4,
-            pointerEvents: 'auto',
-          }}
-          title="Desktop Pet"
-        />
+        <>
+          <iframe
+            src={`${BASE}desktop-pet/index.html`}
+            style={{
+              position: 'fixed', top: 0, left: 0,
+              width: '100vw', height: '100vh',
+              border: 'none', zIndex: 4,
+              pointerEvents: 'none',
+            }}
+            title="Desktop Pet"
+          />
+          <div
+            ref={petOverlayRef}
+            style={{
+              position: 'fixed',
+              left: 0, top: 0,
+              width: '96px', height: '96px',
+              zIndex: 5,
+              cursor: 'grab',
+              pointerEvents: 'auto',
+            }}
+          />
+        </>
       )}
 
       {activeWindow && windows[activeWindow] && (

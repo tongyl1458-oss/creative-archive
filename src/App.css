@@ -20,6 +20,17 @@ html, body, #root {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Mobile: ensure desktop wallpaper is visible, not black */
+@media (max-width: 768px) {
+  .hero-pinned {
+    background: linear-gradient(165deg,
+      #FFD089 0%, #FFB37A 12%, #FF9E76 22%, #F08E80 32%,
+      #C589B0 42%, #8B7EB8 52%, #6B8DD6 62%, #4B7FD0 75%,
+      #3A6FB5 88%, #2C5F9E 100%
+    );
+  }
+}
+
 body {
   overflow-x: hidden;
   overflow-y: auto;

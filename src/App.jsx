@@ -442,9 +442,22 @@ function App() {
   const touchStartY = useRef(null)
   const [scrollPct, setScrollPct] = useState(0)
 
+  // Detect low-performance devices: mobile or small screens skip 3D
+  const isLowPerf = typeof window !== 'undefined' && (
+    /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent) ||
+    window.innerWidth < 768
+  )
+
   useEffect(() => {
     // Reset scroll progress on mount (prevents HMR stale state)
     scrollProgress.current = 0
+
+    // On low-perf devices, skip scroll animation and go straight to desktop
+    if (isLowPerf) {
+      setScrollPct(1)
+      scrollProgress.current = 1
+      return
+    }
 
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
@@ -462,22 +475,48 @@ function App() {
     }, heroRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [isLowPerf])
 
   // Hero overlay opacity: fade out in first 25% of scroll
   const heroOverlayOpacity = Math.max(0, 1 - scrollPct * 4)
 
-  // About section opacity: fade in at 75%+
-  const aboutOpacity = Math.max(0, (scrollPct - 0.75) * 4)
-
-  // macOS desktop fades in at 85%+ scroll
-  const macDesktopVisible = scrollPct > 0.85
+  // macOS desktop fades in at 85%+ scroll (or immediately on mobile)
+  const macDesktopVisible = isLowPerf || scrollPct > 0.85
 
   const enterDesktop = () => {
+    if (isLowPerf) return
     if (heroRef.current) {
       const targetY = window.innerHeight * 1.8
       window.scrollTo({ top: targetY, behavior: 'smooth' })
     }
+  }
+
+  // Mobile: skip 3D Canvas, show desktop directly
+  if (isLowPerf) {
+    return (
+      <div className="app">
+        <div className="hero-pinned" ref={heroRef}>
+          {/* Nav */}
+          <div className="nav-bar" style={{ opacity: 0 }}>
+            <span className="nav-brand">刘怡彤Sunny</span>
+          </div>
+
+          {/* Hero text */}
+          <div className="hero-text" style={{ opacity: 0 }}>
+            <div className="hero-eyebrow">CREATIVE ARCHIVE / 01</div>
+            <h1 className="hero-title">
+              I CREATE<br />WORLDS.
+            </h1>
+            <p className="hero-subtitle">
+              通过影像、人工智能和叙事，<br />创造新的视觉体验。
+            </p>
+          </div>
+
+          {/* macOS Desktop — visible immediately on mobile */}
+          <MacOSDesktop visible={macDesktopVisible} />
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -30,7 +30,7 @@ body {
   width: 100%;
 }
 
-/* R3F Canvas wrapper div — needs pointer-events for mouse tracking */
+/* R3F Canvas wrapper div — pointer-events: none lets wheel scroll pass to body */
 .app > div:first-child {
   position: fixed !important;
   top: 0;
@@ -38,14 +38,14 @@ body {
   width: 100vw !important;
   height: 100vh !important;
   z-index: 1;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .app canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 /* ===== Pinned Hero Section ===== */

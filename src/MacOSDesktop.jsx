@@ -266,10 +266,6 @@ function MacWindow({ title, onClose, children, width = 560, height = 420, initia
   const prevPosition = useRef(null)
 
   useEffect(() => {
-    if (window.innerWidth < 768 && !isFullscreen) {
-      setIsFullscreen(true)
-      return
-    }
     if (!isFullscreen) {
       setPosition({
         x: (window.innerWidth - width) / 2,
@@ -564,17 +560,19 @@ export default function MacOSDesktop({ visible }) {
   const largeH = Math.min(window.innerHeight * 0.82, 680)
   const medW = Math.min(window.innerWidth * 0.78, 900)
   const medH = Math.min(window.innerHeight * 0.75, 620)
+  const smW = Math.min(window.innerWidth * 0.88, 480)
+  const smH = Math.min(window.innerHeight * 0.7, 460)
 
   const windows = {
-    welcome: { title: '欢迎 — Welcome', content: <WelcomeContent onOpen={setActiveWindow} />, width: 480, height: 460 },
+    welcome: { title: '欢迎 — Welcome', content: <WelcomeContent onOpen={setActiveWindow} />, width: smW, height: smH },
     about: { title: '关于我 — 刘怡彤 Sunny', content: <IframeContent src={`${BASE}creative-archive/creative-archive.html`} />, width: medW, height: medH },
-    projects: { title: '作品项目', content: <ProjectsContent onOpen={setActiveWindow} />, width: 560, height: 420 },
+    projects: { title: '作品项目', content: <ProjectsContent onOpen={setActiveWindow} />, width: Math.min(window.innerWidth * 0.88, 560), height: Math.min(window.innerHeight * 0.7, 420) },
     films: { title: '影像作品 — FILMS', content: <IframeContent src={`${BASE}creative-archive/films.html`} />, width: largeW, height: largeH },
     concepts: { title: '创意概念 — CONCEPTS', content: <IframeContent src={`${BASE}creative-archive/concepts.html`} />, width: largeW, height: largeH },
     aiLab: { title: 'AI实验室 — AI LAB', content: <IframeContent src={`${BASE}creative-archive/ai-lab.html`} />, width: largeW, height: largeH },
     visual: { title: '视觉设计 — VISUAL', content: <IframeContent src={`${BASE}creative-archive/visual.html`} />, width: largeW, height: largeH },
     minesweeper: { title: '扫雷 — Minesweeper', content: <IframeContent src={`${BASE}minesweeper/index.html`} />, width: minesweeperSize.width, height: minesweeperSize.height },
-    contact: { title: '联系方式 — Contact', content: <ContactContent />, width: 480, height: 420 },
+    contact: { title: '联系方式 — Contact', content: <ContactContent />, width: smW, height: smH },
   }
 
   const dockItems = [

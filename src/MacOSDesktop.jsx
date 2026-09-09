@@ -142,34 +142,32 @@ function DesktopIcon({ icon: Icon, label, sublabel, color, onClick }) {
 }
 
 /* ===== Dock Icon ===== */
-function DockIcon({ icon: Icon, label, color, imgSrc, onClick, isActive, disabled }) {
+function DockIcon({ icon: Icon, label, color, imgSrc, onClick, isActive }) {
   const [hovered, setHovered] = useState(false)
   return (
     <div
-      className={`mac-dock-item ${disabled ? 'mac-dock-item-disabled' : ''}`}
-      onMouseEnter={() => !disabled && setHovered(true)}
-      onMouseLeave={() => !disabled && setHovered(false)}
-      onClick={() => !disabled && onClick && onClick()}
-      style={{ cursor: disabled ? 'default' : 'pointer' }}
+      className="mac-dock-item"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
     >
       <div
         className="mac-dock-icon-wrap"
         style={{
           background: imgSrc ? 'rgba(255,255,255,0.2)' : color,
-          transform: hovered && !disabled ? 'scale(1.6) translateY(-12px)' : 'scale(1)',
-          opacity: disabled ? 0.6 : 1,
+          transform: hovered ? 'scale(1.6) translateY(-12px)' : 'scale(1)',
         }}
       >
         {imgSrc ? (
           <img src={imgSrc} alt={label} style={{
-            width: hovered && !disabled ? 34 : 24, height: hovered && !disabled ? 34 : 24,
+            width: hovered ? 34 : 24, height: hovered ? 34 : 24,
             objectFit: 'contain', imageRendering: 'pixelated',
           }} />
         ) : (
-          <Icon size={hovered && !disabled ? 34 : 24} color="#fff" strokeWidth={1.5} />
+          <Icon size={hovered ? 34 : 24} color="#fff" strokeWidth={1.5} />
         )}
       </div>
-      <div className="mac-dock-tooltip" style={{ opacity: hovered && !disabled ? 1 : 0 }}>{label}</div>
+      <div className="mac-dock-tooltip" style={{ opacity: hovered ? 1 : 0 }}>{label}</div>
       <div className={`mac-dock-dot ${isActive ? 'active' : ''}`}></div>
     </div>
   )
@@ -695,8 +693,8 @@ export default function MacOSDesktop({ visible }) {
           />
         ))}
         <div className="mac-dock-divider"></div>
-        <DockIcon icon={Settings} label="系统设置" color="#6B7280" onClick={() => {}} disabled />
-        <DockIcon icon={FileText} label="废纸篓" color="#9CA3AF" onClick={() => {}} disabled />
+        <DockIcon icon={Settings} label="系统设置" color="#6B7280" onClick={() => {}} />
+        <DockIcon icon={FileText} label="废纸篓" color="#9CA3AF" onClick={() => {}} />
       </div>
 
       <SubpagePreloader visible={visible} />

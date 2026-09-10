@@ -208,6 +208,7 @@ function IframeContent({ src }) {
           padding-top: 0 !important;
           margin-top: 0 !important;
           min-height: 100vh !important;
+          min-height: 100dvh !important;
           display: flex !important;
           flex-direction: column !important;
           justify-content: center !important;
@@ -215,6 +216,7 @@ function IframeContent({ src }) {
         }
         .studio-space {
           min-height: 100vh !important;
+          min-height: 100dvh !important;
           display: flex !important;
           flex-direction: column !important;
           justify-content: center !important;
@@ -325,7 +327,7 @@ function MacWindow({ title, onClose, children, width = 560, height = 420, initia
           <div className="mac-window-title">{title}</div>
           <div style={{ width: 60 }}></div>
         </div>
-        <div className="mac-window-content" style={{ padding: 0, height: 'calc(100vh - 36px)', overflow: 'hidden' }}>
+        <div className="mac-window-content" style={{ padding: 0, height: 'calc(100dvh - 36px)', overflow: 'hidden' }}>
           {children}
         </div>
       </div>
@@ -647,7 +649,7 @@ export default function MacOSDesktop({ visible }) {
             src={`${BASE}desktop-pet/index.html`}
             style={{
               position: 'fixed', top: 0, left: 0,
-              width: '100vw', height: '100vh',
+              width: '100vw', height: '100dvh',
               border: 'none', zIndex: 4,
               pointerEvents: 'none',
             }}
